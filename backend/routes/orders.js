@@ -93,7 +93,9 @@ router.post("/checkout", authMiddleware, async (req, res) => {
 // Get user's orders
 router.get("/my-orders", authMiddleware, async (req, res) => {
   try {
-    const orders = await Order.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    const orders = await Order.find({ userId: req.user.id })
+      .populate("items.productId")
+      .sort({ createdAt: -1 });
     res.json(orders);
   } catch (err) {
     console.error(err.message);

@@ -146,7 +146,8 @@ const Navigation = () => {
           {dynamicLinks.map((link, i) => (
             <div
               key={link.label}
-              className={`transition-all duration-700 delay-[${(i + 1) * 100}ms] transform ${
+              style={{ transitionDelay: `${(i + 1) * 100}ms` }}
+              className={`transition-all duration-700 transform ${
                 isOpen ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
               }`}
             >
