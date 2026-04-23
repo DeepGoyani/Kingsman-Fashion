@@ -10,6 +10,7 @@ import Checkout from "./pages/Checkout";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
+import Admin from "./pages/Admin";
 import Dashboard from "./pages/Dashboard";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import SmoothScroll from "./components/SmoothScroll";
@@ -30,6 +31,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/admin" element={<Admin />} />
             <Route path="/collections" element={<Collections />} />
             <Route path="/product/:slug" element={<ProductDetail />} />
             <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
