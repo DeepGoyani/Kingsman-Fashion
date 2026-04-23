@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import gsap from "gsap";
 import MagneticButton from "./MagneticButton";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const standardLinks = [
@@ -22,15 +21,10 @@ const Navigation = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
+    const storedUser = localStorage.getItem("kingsman_user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
   }, []);
 
   useEffect(() => {
@@ -81,14 +75,12 @@ const Navigation = () => {
     }
   }, [isOpen]);
 
-  const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success("Logged out successfully");
-      navigate("/");
-    }
+  const handleLogout = () => {
+    localStorage.removeItem("kingsman_token");
+    localStorage.removeItem("kingsman_user");
+    setUser(null);
+    toast.success("Logged out successfully");
+    navigate("/");
     setIsOpen(false);
   };
 

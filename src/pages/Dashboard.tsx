@@ -2,15 +2,15 @@ import { useState, useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
-import { supabase } from "@/integrations/supabase/client";
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-    });
+    const storedUser = localStorage.getItem("kingsman_user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
   }, []);
 
   return (
@@ -27,7 +27,7 @@ const Dashboard = () => {
                 <h2 className="font-heading text-xl text-foreground mb-4">Profile Info</h2>
                 <div className="text-sm text-muted-foreground font-body space-y-2">
                   <p><strong>Email:</strong> {user?.email}</p>
-                  <p><strong>Member Since:</strong> {new Date(user?.created_at).toLocaleDateString()}</p>
+                  <p><strong>Role:</strong> {user?.role}</p>
                 </div>
               </div>
 

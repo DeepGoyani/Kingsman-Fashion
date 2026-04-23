@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+
+const API_BASE = "http://localhost:5000/api";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -18,24 +20,24 @@ const Auth = () => {
     
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
+        const res = await axios.post(`${API_BASE}/auth/login`, {
           email,
           password,
         });
-        if (error) throw error;
-        navigate("/");
+        localStorage.setItem("kingsman_token", res.data.token);
+        localStorage.setItem("kingsman_user", JSON.stringify(res.data.user));
         toast.success("Successfully logged in");
+        navigate("/");
       } else {
-        const { error } = await supabase.auth.signUp({
+        await axios.post(`${API_BASE}/auth/register`, {
           email,
           password,
         });
-        if (error) throw error;
         toast.success("Registration successful! You can now log in.");
         setIsLogin(true);
       }
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.msg || error.message || "An error occurred");
     } finally {
       setIsLoading(false);
     }

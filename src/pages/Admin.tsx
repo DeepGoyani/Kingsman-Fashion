@@ -2,28 +2,24 @@ import { useState, useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
-import { supabase } from "@/integrations/supabase/client";
 import { Navigate } from "react-router-dom";
 
 const Admin = () => {
-  const [session, setSession] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // In a real app, you would check admin status via a secure Supabase query or JWT claim.
-    // Here we just use a basic check for demonstration purposes.
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session?.user?.email === "admin@kingsman.com") {
+    const storedUser = localStorage.getItem("kingsman_user");
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      if (user.role === "admin") {
         setIsAdmin(true);
       }
-      setIsLoading(false);
-    });
+    }
+    setIsLoading(false);
   }, []);
 
   if (isLoading) return <div className="min-h-screen bg-background" />;
-  if (!session) return <Navigate to="/auth" />;
   if (!isAdmin) return <Navigate to="/dashboard" />;
 
   return (

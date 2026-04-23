@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import axios from "axios";
 import { ArrowLeft, Check } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { products, formatPrice } from "@/lib/products";
@@ -11,11 +11,13 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 
 const steps = ["Review", "Address", "Payment"];
+const API_BASE = "http://localhost:5000/api";
 
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCartStore();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const [address, setAddress] = useState({
     name: "",
     phone: "",
@@ -47,7 +49,41 @@ const Checkout = () => {
     );
   }
 
+  const handleCheckout = async () => {
+    setIsLoading(true);
+    try {
+      const checkoutItems = items.map((item) => {
+        const product = products.find((p) => p.id === item.productId);
+        if (!product) throw new Error("Product not found");
+        return {
+          productId: product.id,
+          quantity: item.quantity,
+          type: item.type,
+          size: item.size,
+          itemPrice: item.type === "PURCHASE" ? product.purchasePrice : product.rentPricePerDay,
+          depositAmount: item.type === "RENTAL" ? product.securityDeposit : 0
+        };
+      });
 
+      const token = localStorage.getItem("kingsman_token");
+      if (!token) throw new Error("Not authenticated");
+
+      await axios.post(`${API_BASE}/orders/checkout`, {
+        items: checkoutItems,
+        totalAmount: totalPrice(),
+        shippingAddress: address
+      }, {
+        headers: { "x-auth-token": token }
+      });
+
+      clearCart();
+      navigate("/payment-success");
+    } catch (err: any) {
+      toast.error(err.response?.data?.msg || err.message || "Payment processing failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <PageTransition>
@@ -184,56 +220,19 @@ const Checkout = () => {
             {/* Step 2: Payment */}
             {step === 2 && (
               <div className="space-y-6">
-                <h2 className="font-heading text-3xl text-foreground">Payment</h2>
+                <h2 className="font-heading text-3xl text-foreground">Secure Checkout</h2>
                 <div className="p-8 border border-border text-center space-y-4">
                   <p className="font-body text-muted-foreground">
-                    You'll be redirected to Stripe's secure checkout
+                    Confirm your order placement
                   </p>
                   <p className="font-heading text-3xl text-foreground">{formatPrice(totalPrice())}</p>
                 </div>
                 <button
-                  onClick={async () => {
-                    try {
-                      const checkoutItems = items.map((item) => {
-                        const product = products.find((p) => p.id === item.productId);
-                        if (!product) throw new Error("Product not found");
-                        const rentalDays =
-                          item.startDate && item.endDate
-                            ? Math.max(1, Math.ceil((new Date(item.endDate).getTime() - new Date(item.startDate).getTime()) / 86400000))
-                            : 1;
-                        return {
-                          name: product.name,
-                          amount:
-                            item.type === "PURCHASE"
-                              ? product.purchasePrice * 100
-                              : product.rentPricePerDay * rentalDays * 100,
-                          quantity: item.quantity,
-                          type: item.type,
-                          rentalDays: item.type === "RENTAL" ? rentalDays : undefined,
-                          deposit: item.type === "RENTAL" ? product.securityDeposit * 100 : 0,
-                        };
-                      });
-
-                      const { data, error } = await supabase.functions.invoke("create-checkout", {
-                        body: {
-                          items: checkoutItems,
-                          successUrl: `${window.location.origin}/payment-success`,
-                          cancelUrl: `${window.location.origin}/checkout`,
-                        },
-                      });
-
-                      if (error) throw error;
-                      if (data?.url) {
-                        clearCart();
-                        window.location.href = data.url;
-                      }
-                    } catch (err: any) {
-                      toast.error(err.message || "Payment failed. Please try again.");
-                    }
-                  }}
-                  className="w-full py-4 bg-gold text-foreground font-body text-sm tracking-[0.2em] uppercase hover:bg-gold-light transition-all"
+                  disabled={isLoading}
+                  onClick={handleCheckout}
+                  className="w-full py-4 bg-gold text-foreground font-body text-sm tracking-[0.2em] uppercase hover:bg-gold-light transition-all disabled:opacity-50"
                 >
-                  Pay with Stripe
+                  {isLoading ? 'Processing...' : 'Place Order'}
                 </button>
               </div>
             )}
