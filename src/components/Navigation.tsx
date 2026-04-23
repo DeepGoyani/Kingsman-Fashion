@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import gsap from "gsap";
+import { cn } from "@/lib/utils";
 import MagneticButton from "./MagneticButton";
 import { toast } from "sonner";
 
@@ -121,24 +122,27 @@ const Navigation = () => {
 
       {/* Full-screen overlay menu with pure Tailwind */}
       <div
-        className={`fixed inset-0 z-[55] bg-charcoal flex items-center justify-center transition-all duration-700 ease-in-out ${
-          isOpen ? "opacity-100 pointer-events-auto rounded-none" : "opacity-0 pointer-events-none rounded-b-[100%]"
-        }`}
+        className={cn(
+          "fixed inset-0 z-[55] bg-charcoal flex items-center justify-center transition-opacity duration-500 ease-in-out",
+          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 invisible pointer-events-none"
+        )}
       >
-        <div className="flex flex-col items-center gap-8 translate-y-[-20px]">
+        <div className="flex flex-col items-center gap-6">
           {dynamicLinks.map((link, i) => (
             <div
               key={link.label}
-              style={{ transitionDelay: `${(i + 1) * 100}ms` }}
-              className={`transition-all duration-700 transform ${
-                isOpen ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
-              }`}
+              style={{ 
+                transitionDelay: isOpen ? `${(i + 1) * 75}ms` : '0ms',
+                opacity: isOpen ? 1 : 0,
+                transform: isOpen ? 'translateY(0)' : 'translateY(20px)'
+              }}
+              className="transition-all duration-500 ease-out"
             >
               <MagneticButton strength={0.2}>
                 {link.action ? (
                   <button
                     onClick={link.action}
-                    className="font-heading text-5xl md:text-7xl text-ivory/80 hover:text-gold transition-colors duration-300 tracking-wide hover:tracking-widest inline-block"
+                    className="font-heading text-4xl md:text-7xl text-ivory/95 hover:text-gold transition-all duration-300 tracking-wide hover:tracking-widest"
                   >
                     {link.label}
                   </button>
@@ -146,7 +150,7 @@ const Navigation = () => {
                   <Link
                     to={link.href!}
                     onClick={() => setIsOpen(false)}
-                    className="font-heading text-5xl md:text-7xl text-ivory/80 hover:text-gold transition-colors duration-300 tracking-wide hover:tracking-widest inline-block"
+                    className="font-heading text-4xl md:text-7xl text-ivory/95 hover:text-gold transition-all duration-300 tracking-wide hover:tracking-widest"
                   >
                     {link.label}
                   </Link>
@@ -155,8 +159,15 @@ const Navigation = () => {
             </div>
           ))}
         </div>
-        <div className={`absolute bottom-12 left-0 right-0 flex justify-center transition-all duration-1000 delay-500 ${isOpen ? "opacity-100" : "opacity-0"}`}>
-          <span className="font-body text-sm tracking-[0.3em] text-ivory/30 uppercase">
+        
+        {/* Footer info in overlay */}
+        <div 
+          className={cn(
+            "absolute bottom-12 left-0 right-0 flex justify-center transition-all duration-700 delay-500",
+            isOpen ? "opacity-40 translate-y-0" : "opacity-0 translate-y-4"
+          )}
+        >
+          <span className="font-body text-[10px] tracking-[0.4em] text-ivory uppercase">
             Kingsman Wedding Palace — Est. 2024
           </span>
         </div>
