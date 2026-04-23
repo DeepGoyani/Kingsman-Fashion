@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { format } from "date-fns";
+import { format, isWithinInterval, parseISO } from "date-fns";
+import axios from "axios";
 import { CalendarIcon, ArrowLeft, ShoppingBag, Minus, Plus } from "lucide-react";
-import { getProductBySlug, formatPrice } from "@/lib/products";
+import { formatPrice } from "@/lib/products";
 import { useCartStore } from "@/stores/cartStore";
 import Navigation from "@/components/Navigation";
 import PageTransition from "@/components/PageTransition";
@@ -14,11 +15,17 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
+const API_BASE = "http://localhost:5000/api";
+
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
-  const product = getProductBySlug(slug || "");
+  const [product, setProduct] = useState<any>(null);
+  const [blockedDates, setBlockedDates] = useState<{start: string, end: string}[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const addItem = useCartStore((s) => s.addItem);
   const toggleCart = useCartStore((s) => s.toggleCart);
+  const openCart = useCartStore((s) => s.openCart);
   const totalItems = useCartStore((s) => s.totalItems());
 
   const [mode, setMode] = useState<"PURCHASE" | "RENTAL">("PURCHASE");
@@ -26,6 +33,25 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const prodRes = await axios.get(`${API_BASE}/products/${slug}`);
+        setProduct(prodRes.data);
+        
+        const rentalRes = await axios.get(`${API_BASE}/orders/rentals/${prodRes.data._id}`);
+        setBlockedDates(rentalRes.data);
+      } catch (err) {
+        console.error("Error loading product:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
+  }, [slug]);
+
+  if (isLoading) return <div className="min-h-screen bg-background" />;
 
   if (!product) {
     return (
@@ -41,6 +67,15 @@ const ProductDetail = () => {
       </PageTransition>
     );
   }
+
+  const isDateBlocked = (date: Date) => {
+    return blockedDates.some(range => 
+      isWithinInterval(date, { 
+        start: parseISO(range.start), 
+        end: parseISO(range.end) 
+      })
+    );
+  };
 
   const rentalDays =
     startDate && endDate
@@ -62,14 +97,19 @@ const ProductDetail = () => {
       return;
     }
     addItem({
-      productId: product.id,
+      productId: product._id,
+      name: product.name,
+      price: mode === "PURCHASE" ? product.purchasePrice : product.rentPricePerDay,
+      image: product.images[0],
       type: mode,
       size: selectedSize,
       quantity,
       startDate: startDate?.toISOString(),
       endDate: endDate?.toISOString(),
+      securityDeposit: mode === "RENTAL" ? product.securityDeposit : 0
     });
     toast.success(`${product.name} added to cart`);
+    openCart();
   };
 
   return (
@@ -156,7 +196,7 @@ const ProductDetail = () => {
                     Size
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {product.sizes.map((size) => (
+                    {product.sizes.map((size: string) => (
                       <button
                         key={size}
                         onClick={() => setSelectedSize(size)}
@@ -197,7 +237,7 @@ const ProductDetail = () => {
                             mode="single"
                             selected={startDate}
                             onSelect={setStartDate}
-                            disabled={(date) => date < new Date()}
+                            disabled={(date) => date < new Date() || isDateBlocked(date)}
                             initialFocus
                             className={cn("p-3 pointer-events-auto")}
                           />
@@ -221,7 +261,7 @@ const ProductDetail = () => {
                             mode="single"
                             selected={endDate}
                             onSelect={setEndDate}
-                            disabled={(date) => date < (startDate || new Date())}
+                            disabled={(date) => date < (startDate || new Date()) || isDateBlocked(date)}
                             initialFocus
                             className={cn("p-3 pointer-events-auto")}
                           />

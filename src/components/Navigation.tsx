@@ -97,29 +97,29 @@ const Navigation = () => {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-[60] transition-all duration-500 ${
           scrolled ? "bg-charcoal/90 backdrop-blur-md py-4" : "bg-transparent py-6"
         }`}
       >
         <div className="flex items-center justify-between px-6 md:px-12">
           <MagneticButton strength={0.15}>
-            <Link to="/" className="font-heading text-xl md:text-2xl tracking-wider text-ivory">
+            <Link to="/" onClick={() => setIsOpen(false)} className={`font-heading text-xl md:text-2xl tracking-wider ${isOpen ? 'text-ivory' : 'text-ivory'}`}>
               KINGSMAN
             </Link>
           </MagneticButton>
 
-          <span className="hidden md:block font-body text-xs tracking-[0.3em] text-ivory/50 uppercase tabular-nums">
+          <span className={`hidden md:block font-body text-xs tracking-[0.3em] uppercase tabular-nums transition-colors duration-500 ${isOpen ? 'text-ivory/50' : 'text-ivory/50'}`}>
             {clock}
           </span>
 
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="relative z-[60] flex flex-col gap-1.5 p-2 group"
+            className="relative z-[70] flex flex-col gap-1.5 p-2 group"
             aria-label="Toggle menu"
           >
             <span
               className={`block w-7 h-[2px] bg-ivory transition-all duration-300 ${
-                isOpen ? "rotate-45 translate-y-[5px]" : ""
+                isOpen ? "rotate-45 translate-y-[8px]" : ""
               }`}
             />
             <span
@@ -129,24 +129,26 @@ const Navigation = () => {
             />
             <span
               className={`block w-7 h-[2px] bg-ivory transition-all duration-300 ${
-                isOpen ? "-rotate-45 -translate-y-[5px]" : ""
+                isOpen ? "-rotate-45 -translate-y-[8px]" : ""
               }`}
             />
           </button>
         </div>
       </nav>
 
-      {/* Full-screen overlay menu */}
+      {/* Full-screen overlay menu with pure Tailwind */}
       <div
-        ref={overlayRef}
-        className={`fixed inset-0 z-[55] bg-charcoal flex items-center justify-center ${isOpen ? "pointer-events-auto" : "pointer-events-none"}`}
-        style={{ clipPath: "circle(0% at calc(100% - 40px) 40px)" }}
+        className={`fixed inset-0 z-[55] bg-charcoal flex items-center justify-center transition-all duration-700 ease-in-out ${
+          isOpen ? "opacity-100 pointer-events-auto rounded-none" : "opacity-0 pointer-events-none rounded-b-[100%]"
+        }`}
       >
-        <div className="flex flex-col items-center gap-8" style={{ perspective: "800px" }}>
+        <div className="flex flex-col items-center gap-8 translate-y-[-20px]">
           {dynamicLinks.map((link, i) => (
             <div
               key={link.label}
-              ref={(el) => { linksRef.current[i] = el; }}
+              className={`transition-all duration-700 delay-[${(i + 1) * 100}ms] transform ${
+                isOpen ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
+              }`}
             >
               <MagneticButton strength={0.2}>
                 {link.action ? (
@@ -169,7 +171,7 @@ const Navigation = () => {
             </div>
           ))}
         </div>
-        <div className="absolute bottom-12 left-0 right-0 flex justify-center">
+        <div className={`absolute bottom-12 left-0 right-0 flex justify-center transition-all duration-1000 delay-500 ${isOpen ? "opacity-100" : "opacity-0"}`}>
           <span className="font-body text-sm tracking-[0.3em] text-ivory/30 uppercase">
             Kingsman Wedding Palace — Est. 2024
           </span>

@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { products, categories, formatPrice } from "@/lib/products";
-import { ProductCategory } from "@/types/product";
+import axios from "axios";
+import { categories, formatPrice } from "@/lib/products";
 import Navigation from "@/components/Navigation";
 import PageTransition from "@/components/PageTransition";
 import Footer from "@/components/Footer";
@@ -12,13 +12,26 @@ import { useCartStore } from "@/stores/cartStore";
 
 const Collections = () => {
   const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [productList, setProductList] = useState<any[]>([]);
   const totalItems = useCartStore((s) => s.totalItems());
   const toggleCart = useCartStore((s) => s.toggleCart);
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/products");
+        setProductList(res.data);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   const filtered =
     activeCategory === "all"
-      ? products
-      : products.filter((p) => p.category === activeCategory);
+      ? productList
+      : productList.filter((p) => p.category === activeCategory);
 
   return (
     <PageTransition>

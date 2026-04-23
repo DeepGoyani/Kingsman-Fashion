@@ -63,10 +63,9 @@ export const useCartStore = create<CartStore>()(
 
       totalPrice: () =>
         get().items.reduce((sum, item) => {
-          const product = products.find((p) => p.id === item.productId);
-          if (!product) return sum;
-          if (item.type === "PURCHASE") return sum + product.purchasePrice * item.quantity;
-          // Rental: calculate days
+          const basePrice = item.price * item.quantity;
+          if (item.type === "PURCHASE") return sum + basePrice;
+          
           if (item.startDate && item.endDate) {
             const days = Math.max(
               1,
@@ -75,9 +74,9 @@ export const useCartStore = create<CartStore>()(
                   (1000 * 60 * 60 * 24)
               )
             );
-            return sum + product.rentPricePerDay * days * item.quantity;
+            return sum + (item.price * days * item.quantity) + (item.securityDeposit || 0);
           }
-          return sum + product.rentPricePerDay * item.quantity;
+          return sum + basePrice + (item.securityDeposit || 0);
         }, 0),
     }),
     { name: "kingsman-cart", partialize: (state) => ({ items: state.items }) }

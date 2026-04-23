@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ArrowLeft, Check } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
-import { products, formatPrice } from "@/lib/products";
+import { formatPrice } from "@/lib/products";
 import Navigation from "@/components/Navigation";
 import PageTransition from "@/components/PageTransition";
 import Footer from "@/components/Footer";
@@ -53,15 +53,15 @@ const Checkout = () => {
     setIsLoading(true);
     try {
       const checkoutItems = items.map((item) => {
-        const product = products.find((p) => p.id === item.productId);
-        if (!product) throw new Error("Product not found");
         return {
-          productId: product.id,
+          productId: item.productId,
           quantity: item.quantity,
           type: item.type,
           size: item.size,
-          itemPrice: item.type === "PURCHASE" ? product.purchasePrice : product.rentPricePerDay,
-          depositAmount: item.type === "RENTAL" ? product.securityDeposit : 0
+          itemPrice: item.price,
+          depositAmount: item.securityDeposit || 0,
+          startDate: item.startDate,
+          endDate: item.endDate
         };
       });
 
@@ -129,15 +129,13 @@ const Checkout = () => {
                 <h2 className="font-heading text-3xl text-foreground">Review Order</h2>
                 <div className="space-y-4">
                   {items.map((item) => {
-                    const product = products.find((p) => p.id === item.productId);
-                    if (!product) return null;
                     return (
                       <div key={`${item.productId}-${item.type}`} className="flex gap-4 py-4 border-b border-border">
                         <div className="w-16 h-20 bg-muted flex-shrink-0">
-                          <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+                          <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                         </div>
                         <div className="flex-1">
-                          <h4 className="font-heading text-sm text-foreground">{product.name}</h4>
+                          <h4 className="font-heading text-sm text-foreground">{item.name}</h4>
                           <p className="font-body text-xs text-muted-foreground">
                             {item.type === "RENTAL" ? "Rental" : "Purchase"} · Size: {item.size} · Qty: {item.quantity}
                           </p>
@@ -150,12 +148,12 @@ const Checkout = () => {
                         <span className="font-body text-sm text-foreground">
                           {formatPrice(
                             item.type === "PURCHASE"
-                              ? product.purchasePrice * item.quantity
+                              ? item.price * item.quantity
                               : item.startDate && item.endDate
-                              ? product.rentPricePerDay *
+                              ? (item.price *
                                 Math.max(1, Math.ceil((new Date(item.endDate).getTime() - new Date(item.startDate).getTime()) / 86400000)) *
-                                item.quantity
-                              : product.rentPricePerDay * item.quantity
+                                item.quantity) + (item.securityDeposit || 0)
+                              : item.price * item.quantity
                           )}
                         </span>
                       </div>

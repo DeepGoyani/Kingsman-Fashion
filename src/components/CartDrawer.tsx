@@ -101,22 +101,25 @@ const CartDrawer = () => {
   );
 };
 
-function CartItemRow({ item }: { item: ReturnType<typeof useCartStore.getState>["items"][0] }) {
+function CartItemRow({ item }: { item: any }) {
   const { removeItem, updateQuantity } = useCartStore();
-  const product = products.find((p) => p.id === item.productId);
-  if (!product) return null;
 
   return (
     <div className="flex gap-4">
       <div className="w-16 h-20 bg-muted flex-shrink-0 overflow-hidden">
-        <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-heading text-sm text-foreground truncate">{product.name}</h4>
+        <h4 className="font-heading text-sm text-foreground truncate">{item.name}</h4>
         <p className="font-body text-xs text-muted-foreground">
-          Size: {item.size}
+          Size: {item.size} · {formatPrice(item.price)}
           {item.type === "RENTAL" && item.startDate && item.endDate && (
-            <> · {format(new Date(item.startDate), "MMM d")} – {format(new Date(item.endDate), "MMM d")}</>
+            <>
+              <br />
+              {format(new Date(item.startDate), "MMM d")} – {format(new Date(item.endDate), "MMM d")}
+              <br />
+              <span className="text-gold">Deposit: {formatPrice(item.securityDeposit || 0)}</span>
+            </>
           )}
         </p>
         <div className="flex items-center justify-between mt-2">

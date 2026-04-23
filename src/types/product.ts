@@ -17,9 +17,13 @@ export interface Product {
 
 export interface CartItem {
   productId: string;
+  name: string;
+  price: number;
+  image: string;
   type: "PURCHASE" | "RENTAL";
   size: string;
   quantity: number;
   startDate?: string;
   endDate?: string;
+  securityDeposit?: number;
 }
