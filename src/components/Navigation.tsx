@@ -86,6 +86,7 @@ const Navigation = () => {
 
   const dynamicLinks = [
     ...standardLinks,
+    ...(user?.role === "admin" ? [{ label: "Admin", href: "/admin" }] : []),
     ...(user
       ? [
           { label: "Dashboard", href: "/dashboard" },
