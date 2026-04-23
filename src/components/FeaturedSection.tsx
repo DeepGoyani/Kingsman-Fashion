@@ -74,36 +74,6 @@ const FeaturedSection = () => {
 
     return () => ctx.revert();
   }, [featuredProducts]);
-    const isMobile = window.innerWidth < 768;
-    const directions = isMobile ? mobileDirections : desktopDirections;
-
-    const ctx = gsap.context(() => {
-      cardsRef.current.filter(Boolean).forEach((card, i) => {
-        const dir = directions[i];
-        gsap.fromTo(
-          card,
-          { opacity: 0, y: dir.y, x: dir.x, rotate: dir.rotate, scale: dir.scale },
-          {
-            opacity: 1,
-            y: 0,
-            x: 0,
-            rotate: 0,
-            scale: 1,
-            duration: 1.1,
-            ease: "power3.out",
-            delay: i * 0.08,
-            scrollTrigger: {
-              trigger: card,
-              start: "top 92%",
-              toggleActions: "restart none none reverse",
-            },
-          }
-        );
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
 
   return (
     <section ref={sectionRef} className="bg-background py-24 md:py-32 px-6 md:px-16">
