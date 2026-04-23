@@ -1,22 +1,37 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import gsap from "gsap";
 import MagneticButton from "./MagneticButton";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
-const navLinks = [
+const standardLinks = [
   { label: "Home", href: "/" },
   { label: "Collections", href: "/collections" },
-  { label: "Lookbook", href: "#lookbook" },
-  { label: "About", href: "#about" },
-  { label: "Contact", href: "#footer" },
+  { label: "Lookbook", href: "/#lookbook" },
+  { label: "About", href: "/#about" },
 ];
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [clock, setClock] = useState("");
   const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const linksRef = useRef<(HTMLDivElement | null)[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const updateClock = () => {
@@ -65,6 +80,27 @@ const Navigation = () => {
       }
     }
   }, [isOpen]);
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Logged out successfully");
+      navigate("/");
+    }
+    setIsOpen(false);
+  };
+
+  const dynamicLinks = [
+    ...standardLinks,
+    ...(user
+      ? [
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Logout", action: handleLogout }
+        ]
+      : [{ label: "Login", href: "/auth" }]),
+  ];
 
   return (
     <>
@@ -115,19 +151,28 @@ const Navigation = () => {
         style={{ clipPath: "circle(0% at calc(100% - 40px) 40px)" }}
       >
         <div className="flex flex-col items-center gap-8" style={{ perspective: "800px" }}>
-          {navLinks.map((link, i) => (
+          {dynamicLinks.map((link, i) => (
             <div
               key={link.label}
               ref={(el) => { linksRef.current[i] = el; }}
             >
               <MagneticButton strength={0.2}>
-                <a
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className="font-heading text-5xl md:text-7xl text-ivory/80 hover:text-gold transition-colors duration-300 tracking-wide hover:tracking-widest inline-block"
-                >
-                  {link.label}
-                </a>
+                {link.action ? (
+                  <button
+                    onClick={link.action}
+                    className="font-heading text-5xl md:text-7xl text-ivory/80 hover:text-gold transition-colors duration-300 tracking-wide hover:tracking-widest inline-block"
+                  >
+                    {link.label}
+                  </button>
+                ) : (
+                  <Link
+                    to={link.href!}
+                    onClick={() => setIsOpen(false)}
+                    className="font-heading text-5xl md:text-7xl text-ivory/80 hover:text-gold transition-colors duration-300 tracking-wide hover:tracking-widest inline-block"
+                  >
+                    {link.label}
+                  </Link>
+                )}
               </MagneticButton>
             </div>
           ))}
