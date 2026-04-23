@@ -1,21 +1,14 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import collection1 from "@/assets/collection-1.jpg";
-import collection2 from "@/assets/collection-2.jpg";
-import collection3 from "@/assets/collection-3.jpg";
-import collection4 from "@/assets/collection-4.jpg";
+import axios from "axios";
+import { formatPrice } from "@/lib/products";
 import RevealText from "./RevealText";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const products = [
-  { src: collection1, name: "Royal Purple Lehenga", price: "₹45,000", rentPrice: "₹4,500/day", slug: "scarlet-bridal-lehenga" },
-  { src: collection2, name: "Ivory Gold Sherwani", price: "₹38,000", rentPrice: "₹3,800/day", slug: "imperial-gold-sherwani" },
-  { src: collection3, name: "Maroon Velvet Kurta", price: "₹22,000", rentPrice: "₹2,200/day", slug: "midnight-velvet-suit" },
-  { src: collection4, name: "Teal Designer Saree", price: "₹32,000", rentPrice: "₹3,200/day", slug: "emerald-bridal-lehenga" },
-];
+const API_BASE = "http://localhost:5000/api";
 
 const desktopDirections = [
   { x: -120, y: 60, rotate: -5, scale: 0.85 },
@@ -32,10 +25,55 @@ const mobileDirections = [
 ];
 
 const FeaturedSection = () => {
+  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        const res = await axios.get(`${API_BASE}/products`);
+        setFeaturedProducts(res.data.filter((p: any) => p.featured).slice(0, 4));
+      } catch (err) {
+        console.error("Error fetching featured products:", err);
+      }
+    };
+    fetchFeatured();
+  }, []);
+
+  useEffect(() => {
+    if (featuredProducts.length === 0) return;
+
+    const isMobile = window.innerWidth < 768;
+    const directions = isMobile ? mobileDirections : desktopDirections;
+
+    const ctx = gsap.context(() => {
+      cardsRef.current.filter(Boolean).forEach((card, i) => {
+        const dir = directions[i] || directions[0];
+        gsap.fromTo(
+          card,
+          { opacity: 0, y: dir.y, x: dir.x, rotate: dir.rotate, scale: dir.scale },
+          {
+            opacity: 1,
+            y: 0,
+            x: 0,
+            rotate: 0,
+            scale: 1,
+            duration: 1.1,
+            ease: "power3.out",
+            delay: i * 0.08,
+            scrollTrigger: {
+              trigger: card,
+              start: "top 92%",
+              toggleActions: "restart none none reverse",
+            },
+          }
+        );
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, [featuredProducts]);
     const isMobile = window.innerWidth < 768;
     const directions = isMobile ? mobileDirections : desktopDirections;
 
@@ -80,16 +118,16 @@ const FeaturedSection = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" style={{ perspective: "1000px" }}>
-          {products.map((product, i) => (
+          {featuredProducts.map((product, i) => (
             <Link
-              key={i}
+              key={product._id}
               to={`/product/${product.slug}`}
-              ref={(el) => { cardsRef.current[i] = el; }}
+              ref={(el: any) => { cardsRef.current[i] = el; }}
               className="group cursor-pointer block"
             >
               <div className="relative overflow-hidden aspect-[3/4] mb-5 border border-transparent group-hover:border-gold/40 transition-all duration-500 group-hover:shadow-[0_20px_60px_-15px_hsl(42_45%_53%/0.25)]">
                 <img
-                  src={product.src}
+                  src={product.images[0]}
                   alt={product.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
@@ -105,8 +143,8 @@ const FeaturedSection = () => {
                 {product.name}
               </h3>
               <div className="flex items-center gap-3">
-                <span className="font-body text-sm text-foreground">{product.price}</span>
-                <span className="font-body text-xs text-muted-foreground">or {product.rentPrice}</span>
+                <span className="font-body text-sm text-foreground">{formatPrice(product.purchasePrice)}</span>
+                <span className="font-body text-xs text-muted-foreground">or {formatPrice(product.rentPricePerDay)}/day</span>
               </div>
             </Link>
           ))}

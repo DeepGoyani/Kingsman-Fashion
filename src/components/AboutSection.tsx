@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import aboutBg from "@/assets/about-bg.jpg";
 import RevealText from "./RevealText";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -63,7 +62,7 @@ const AboutSection = () => {
         {/* Image side */}
         <div className="relative h-[50vh] md:h-auto overflow-hidden">
           <div ref={imageRef} className="absolute inset-[-10%] scale-110">
-            <img src={aboutBg} alt="Luxury collection" className="w-full h-full object-cover" />
+            <img src="/assets/about-bg.jpg" alt="Luxury collection" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-charcoal/30" />
           </div>
         </div>

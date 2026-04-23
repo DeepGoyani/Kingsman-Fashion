@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import heroBg from "@/assets/hero-bg.jpg";
 import MagneticButton from "./MagneticButton";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -97,7 +96,7 @@ const HeroSection = () => {
     <section ref={sectionRef} className="relative h-screen overflow-hidden flex items-center justify-center">
       {/* Background */}
       <div ref={imageRef} className="absolute inset-0 scale-100">
-        <img src={heroBg} alt="Luxury ethnic wear" className="w-full h-full object-cover" />
+        <img src="/assets/hero-bg.jpg" alt="Luxury ethnic wear" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-charcoal/60" />
       </div>
 

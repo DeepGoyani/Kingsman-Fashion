@@ -1,18 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import lookbook1 from "@/assets/lookbook-1.jpg";
-import lookbook2 from "@/assets/lookbook-2.jpg";
-import lookbook3 from "@/assets/lookbook-3.jpg";
-import lookbook4 from "@/assets/lookbook-4.jpg";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const images = [
-  { src: lookbook1, title: "Bridal Lehenga", subtitle: "Heritage Collection" },
-  { src: lookbook2, title: "Royal Sherwani", subtitle: "Groom's Edit" },
-  { src: lookbook3, title: "Emerald Anarkali", subtitle: "Festive Collection" },
-  { src: lookbook4, title: "Golden Saree", subtitle: "Occasion Wear" },
+  { src: "/assets/lookbook-1.jpg", title: "Bridal Lehenga", subtitle: "Heritage Collection" },
+  { src: "/assets/lookbook-2.jpg", title: "Royal Sherwani", subtitle: "Groom's Edit" },
+  { src: "/assets/lookbook-3.jpg", title: "Emerald Anarkali", subtitle: "Festive Collection" },
+  { src: "/assets/lookbook-4.jpg", title: "Golden Saree", subtitle: "Occasion Wear" },
 ];
 
 const LookbookSection = () => {
