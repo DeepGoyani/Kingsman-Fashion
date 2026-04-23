@@ -17,7 +17,6 @@ const Navigation = () => {
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<any>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
-  const linksRef = useRef<(HTMLDivElement | null)[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,25 +52,8 @@ const Navigation = () => {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      gsap.fromTo(
-        overlayRef.current,
-        { clipPath: "circle(0% at calc(100% - 40px) 40px)" },
-        { clipPath: "circle(150% at calc(100% - 40px) 40px)", duration: 0.8, ease: "power3.inOut" }
-      );
-      gsap.fromTo(
-        linksRef.current.filter(Boolean),
-        { y: 80, opacity: 0, rotateX: 40 },
-        { y: 0, opacity: 1, rotateX: 0, stagger: 0.08, duration: 0.6, ease: "power3.out", delay: 0.3 }
-      );
     } else {
       document.body.style.overflow = "";
-      if (overlayRef.current) {
-        gsap.to(overlayRef.current, {
-          clipPath: "circle(0% at calc(100% - 40px) 40px)",
-          duration: 0.5,
-          ease: "power3.inOut",
-        });
-      }
     }
   }, [isOpen]);
 
