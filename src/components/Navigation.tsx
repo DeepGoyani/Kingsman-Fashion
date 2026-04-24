@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import gsap from "gsap";
 import { cn } from "@/lib/utils";
 import MagneticButton from "./MagneticButton";
 import { toast } from "sonner";
@@ -127,7 +126,7 @@ const Navigation = () => {
           isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 invisible pointer-events-none"
         )}
       >
-        <div className="flex flex-col items-center gap-6">
+        <div className="relative z-20 flex flex-col items-center gap-6">
           {dynamicLinks.map((link, i) => (
             <div
               key={link.label}
@@ -138,24 +137,22 @@ const Navigation = () => {
               }}
               className="transition-all duration-500 ease-out py-2"
             >
-              <MagneticButton strength={0.2}>
-                {link.action ? (
-                  <button
-                    onClick={link.action}
-                    className="font-heading text-5xl md:text-7xl text-ivory hover:text-gold transition-all duration-300 tracking-wide text-center"
-                  >
-                    {link.label}
-                  </button>
-                ) : (
-                  <Link
-                    to={link.href!}
-                    onClick={() => setIsOpen(false)}
-                    className="font-heading text-5xl md:text-7xl text-ivory hover:text-gold transition-all duration-300 tracking-wide text-center"
-                  >
-                    {link.label}
-                  </Link>
-                )}
-              </MagneticButton>
+              {link.action ? (
+                <button
+                  onClick={link.action}
+                  className="font-heading text-6xl md:text-8xl text-ivory/95 hover:text-gold transition-all duration-500 tracking-wide"
+                >
+                  {link.label}
+                </button>
+              ) : (
+                <Link
+                  to={link.href!}
+                  onClick={() => setIsOpen(false)}
+                  className="font-heading text-6xl md:text-8xl text-ivory/95 hover:text-gold transition-all duration-500 tracking-wide"
+                >
+                  {link.label}
+                </Link>
+              )}
             </div>
           ))}
         </div>
