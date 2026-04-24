@@ -6,7 +6,6 @@ import { categories, formatPrice } from "@/lib/products";
 import Navigation from "@/components/Navigation";
 import PageTransition from "@/components/PageTransition";
 import Footer from "@/components/Footer";
-import CartDrawer from "@/components/CartDrawer";
 import { ShoppingBag } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 
@@ -37,7 +36,6 @@ const Collections = () => {
     <PageTransition>
       <div className="bg-background min-h-screen">
         <Navigation />
-        <CartDrawer />
 
         {/* Header */}
         <section className="pt-32 pb-12 px-6 md:px-12">

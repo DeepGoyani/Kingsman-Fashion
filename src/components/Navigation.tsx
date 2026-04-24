@@ -41,21 +41,26 @@ const Navigation = () => {
     if (href.startsWith("/#")) {
       const id = href.replace("/#", "");
       if (location.pathname === "/") {
-        document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+        setTimeout(() => {
+          document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
       } else {
         navigate("/");
         setTimeout(() => {
           document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-        }, 100);
+        }, 500); // Give time for page to load
       }
     } else {
       navigate(href);
+      window.scrollTo(0, 0); // Reset scroll on page change
     }
   };
 
   const handleCartClick = () => {
     setIsOpen(false);
-    openCart();
+    setTimeout(() => {
+      openCart();
+    }, 300); // Small delay to let menu close first
   };
 
   const menuItems = [
@@ -69,27 +74,24 @@ const Navigation = () => {
     <>
       <nav 
         className={cn(
-          "fixed top-0 left-0 right-0 z-[100] transition-all duration-500 px-6 md:px-12",
-          scrolled ? "bg-charcoal/90 backdrop-blur-md py-4 shadow-xl" : "bg-transparent py-8"
+          "fixed top-0 left-0 right-0 z-[110] transition-all duration-500 px-6 md:px-12",
+          scrolled ? "bg-charcoal/95 backdrop-blur-md py-4 shadow-2xl" : "bg-transparent py-8"
         )}
       >
         <div className="max-w-[1440px] mx-auto flex items-center justify-between">
-          {/* Logo */}
           <MagneticButton strength={0.1}>
             <Link to="/" onClick={() => setIsOpen(false)} className="font-heading text-xl md:text-2xl tracking-[0.2em] text-ivory">
               KINGSMAN
             </Link>
           </MagneticButton>
 
-          {/* Clock */}
           <div className="hidden md:block font-body text-xs tracking-[0.4em] text-gold/60 uppercase tabular-nums">
             {clock}
           </div>
 
-          {/* Burger Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="relative z-[110] flex flex-col items-end gap-1.5 p-2 group overflow-hidden"
+            className="relative z-[120] flex flex-col items-end gap-1.5 p-2 group overflow-hidden"
           >
             <span className={cn("block h-[2px] bg-gold transition-all duration-500", isOpen ? "w-8 rotate-45 translate-y-[8px]" : "w-8")} />
             <span className={cn("block h-[2px] bg-gold transition-all duration-500", isOpen ? "w-0 opacity-0" : "w-5 group-hover:w-8")} />
@@ -98,11 +100,10 @@ const Navigation = () => {
         </div>
       </nav>
 
-      {/* Full-Screen Hamburger Menu */}
       <div 
         className={cn(
-          "fixed inset-0 z-[90] bg-charcoal flex items-center justify-center transition-all duration-700 ease-in-out",
-          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          "fixed inset-0 z-[105] bg-charcoal flex items-center justify-center transition-all duration-700 ease-in-out",
+          isOpen ? "opacity-100 pointer-events-auto visible" : "opacity-0 pointer-events-none invisible"
         )}
       >
         {/* Dynamic Background Ornament */}

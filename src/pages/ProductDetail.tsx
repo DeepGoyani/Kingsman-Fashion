@@ -7,7 +7,6 @@ import { formatPrice } from "@/lib/products";
 import { useCartStore } from "@/stores/cartStore";
 import Navigation from "@/components/Navigation";
 import PageTransition from "@/components/PageTransition";
-import CartDrawer from "@/components/CartDrawer";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -116,7 +115,6 @@ const ProductDetail = () => {
     <PageTransition>
       <div className="bg-background min-h-screen">
         <Navigation />
-        <CartDrawer />
 
         <section className="pt-28 pb-24 px-6 md:px-12">
           <div className="max-w-7xl mx-auto">

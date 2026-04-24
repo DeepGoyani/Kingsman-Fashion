@@ -16,6 +16,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import SmoothScroll from "./components/SmoothScroll";
 import CursorFollower from "./components/CursorFollower";
 import ScrollProgress from "./components/ScrollProgress";
+import CartDrawer from "./components/CartDrawer";
 
 const queryClient = new QueryClient();
 
@@ -24,10 +25,11 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <SmoothScroll>
+      <BrowserRouter>
         <CursorFollower />
         <ScrollProgress />
-        <BrowserRouter>
+        <CartDrawer />
+        <SmoothScroll>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -40,8 +42,8 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </BrowserRouter>
-      </SmoothScroll>
+        </SmoothScroll>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
