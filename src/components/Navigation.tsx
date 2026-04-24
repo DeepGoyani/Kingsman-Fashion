@@ -136,13 +136,13 @@ const Navigation = () => {
                 opacity: isOpen ? 1 : 0,
                 transform: isOpen ? 'translateY(0)' : 'translateY(20px)'
               }}
-              className="transition-all duration-500 ease-out"
+              className="transition-all duration-500 ease-out py-2"
             >
               <MagneticButton strength={0.2}>
                 {link.action ? (
                   <button
                     onClick={link.action}
-                    className="font-heading text-4xl md:text-7xl text-ivory/95 hover:text-gold transition-all duration-300 tracking-wide hover:tracking-widest"
+                    className="font-heading text-5xl md:text-7xl text-ivory hover:text-gold transition-all duration-300 tracking-wide text-center"
                   >
                     {link.label}
                   </button>
@@ -150,7 +150,7 @@ const Navigation = () => {
                   <Link
                     to={link.href!}
                     onClick={() => setIsOpen(false)}
-                    className="font-heading text-4xl md:text-7xl text-ivory/95 hover:text-gold transition-all duration-300 tracking-wide hover:tracking-widest"
+                    className="font-heading text-5xl md:text-7xl text-ivory hover:text-gold transition-all duration-300 tracking-wide text-center"
                   >
                     {link.label}
                   </Link>
