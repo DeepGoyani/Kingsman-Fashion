@@ -11,7 +11,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 
 const steps = ["Review", "Address", "Payment"];
-const API_BASE = "http://localhost:5000/api";
+import { API_BASE_URL as API_BASE } from "@/lib/api-config";
 
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCartStore();

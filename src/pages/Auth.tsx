@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-
-const API_BASE = "http://localhost:5000/api";
+import { API_BASE_URL as API_BASE } from "@/lib/api-config";
 
 const Auth = () => {
   const [email, setEmail] = useState("");

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import { API_BASE_URL as API_BASE } from "@/lib/api-config";
 import { categories, formatPrice } from "@/lib/products";
 import Navigation from "@/components/Navigation";
 import PageTransition from "@/components/PageTransition";
@@ -18,7 +19,7 @@ const Collections = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/products");
+        const res = await axios.get(`${API_BASE}/products`);
         setProductList(res.data);
       } catch (err) {
         console.error("Error fetching products:", err);

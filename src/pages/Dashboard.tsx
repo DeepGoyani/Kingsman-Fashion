@@ -6,7 +6,7 @@ import PageTransition from "@/components/PageTransition";
 import { formatPrice } from "@/lib/products";
 import { format } from "date-fns";
 
-const API_BASE = "http://localhost:5000/api";
+import { API_BASE_URL as API_BASE } from "@/lib/api-config";
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);

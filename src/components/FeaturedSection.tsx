@@ -8,7 +8,7 @@ import RevealText from "./RevealText";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const API_BASE = "http://localhost:5000/api";
+import { API_BASE_URL as API_BASE } from "@/lib/api-config";
 
 const desktopDirections = [
   { x: -120, y: 60, rotate: -5, scale: 0.85 },

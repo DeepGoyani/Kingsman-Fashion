@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-const API_BASE = "http://localhost:5000/api";
+import { API_BASE_URL as API_BASE } from "@/lib/api-config";
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
